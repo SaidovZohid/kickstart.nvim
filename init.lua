@@ -161,6 +161,8 @@ vim.opt.scrolloff = 10
 -- See `:help 'confirm'`
 vim.opt.confirm = true
 
+vim.o.winbar = '%=%F'
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -286,6 +288,63 @@ require('lazy').setup({
       }
     end,
   },
+
+  { -- It's requiered for neo-test
+    'nvim-neotest/nvim-nio',
+  },
+  { -- Neo-Test for Golang
+    'nvim-neotest/neotest',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'antoinemadec/FixCursorHold.nvim',
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-neotest/neotest-go', -- Go adapter
+    },
+    config = function()
+      require('neotest').setup {
+        adapters = {
+          require 'neotest-go' {
+            experimental = {
+              test_table = true,
+            },
+            args = { '-v' }, -- verbose output
+          },
+          -- Add more adapters here in future, like:
+          -- require("neotest-python")({ dap = { justMyCode = false } }),
+          -- require("neotest-jest")({}),
+        },
+      }
+
+      local map = vim.keymap.set
+      local opts = { noremap = true, silent = true }
+
+      -- 🧪 Run nearest test
+      map('n', '<leader>tt', function()
+        require('neotest').run.run()
+      end, vim.tbl_extend('force', opts, { desc = 'Run nearest test' }))
+
+      -- 🧪 Run current file
+      map('n', '<leader>tf', function()
+        require('neotest').run.run(vim.fn.expand '%')
+      end, vim.tbl_extend('force', opts, { desc = 'Run all tests in file' }))
+
+      -- 🧪 Run last test
+      map('n', '<leader>tl', function()
+        require('neotest').run.run_last()
+      end, vim.tbl_extend('force', opts, { desc = 'Run last test' }))
+
+      -- 📺 Open output panel
+      map('n', '<leader>to', function()
+        require('neotest').output.open { enter = true, auto_close = true }
+      end, vim.tbl_extend('force', opts, { desc = 'Open test output' }))
+
+      -- 🪵 Open summary window
+      map('n', '<leader>ts', function()
+        require('neotest').summary.toggle()
+      end, vim.tbl_extend('force', opts, { desc = 'Toggle test summary' }))
+    end,
+  },
+
   --
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`.
@@ -490,11 +549,10 @@ require('lazy').setup({
       require('bufferline').setup {
         options = {
           mode = 'buffers', -- set to 'tabs' to use tabpages instead
-          numbers = 'ordinal',
           diagnostics = 'nvim_lsp',
           show_buffer_close_icons = false,
           show_close_icon = false,
-          separator_style = 'slant', -- or "thick" | "thin" | { 'left', 'right' }
+          separator_style = 'thin', -- or "thick" | "thin" | { 'left', 'right' }
           offsets = {
             {
               filetype = 'NvimTree',
@@ -523,6 +581,60 @@ require('lazy').setup({
         local current = vim.fn.bufnr()
         vim.cmd('bufdo if bufnr("") != ' .. current .. ' | bdelete | endif')
       end, { desc = 'Close other buffers', silent = true })
+    end,
+  },
+
+  { -- It's plugin that gives the snippets and autocompletion recommendation while typing.
+    'hrsh7th/nvim-cmp',
+    dependencies = {
+      'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-path',
+      'L3MON4D3/LuaSnip', -- optional, for snippet support
+      'saadparwaiz1/cmp_luasnip', -- optional, for LuaSnip integration
+    },
+    config = function()
+      local cmp = require 'cmp'
+      local luasnip = require 'luasnip'
+
+      cmp.setup {
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
+        mapping = cmp.mapping.preset.insert {
+          ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+          ['<C-f>'] = cmp.mapping.scroll_docs(4),
+          ['<C-Space>'] = cmp.mapping.complete(),
+          ['<CR>'] = cmp.mapping.confirm { select = true },
+          ['<Tab>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+          ['<S-Tab>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif luasnip.jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+        },
+        sources = cmp.config.sources({
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' }, -- optional, for LuaSnip snippets
+        }, {
+          { name = 'buffer' },
+          { name = 'path' },
+        }),
+      }
     end,
   },
 
@@ -964,27 +1076,23 @@ require('lazy').setup({
     },
   },
 
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
+  {
+    'rebelot/kanagawa.nvim',
+    priority = 1000,
     config = function()
       ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
+      require('kanagawa').setup {
+        colors = { theme = { all = { ui = { bg_gutter = 'none' } } } },
+        theme = 'dragon', -- sets the dragon variant
+        background = {
+          dark = 'dragon',
+          light = 'lotus',
         },
       }
-
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'kanagawa-dragon'
     end,
   },
+
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = true } },
 
