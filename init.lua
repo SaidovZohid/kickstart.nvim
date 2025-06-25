@@ -174,6 +174,9 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- Set <leader>p to "\"_dP"
 vim.keymap.set('x', '<leader>p', '"_dP', { desc = 'Paste without overwriting register' })
 
+-- CodeCompanion keymaps
+vim.keymap.set('n', '<leader>cc', ':CodeCompanion chat<CR>', { desc = 'Open CodeCompanion Chat' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -213,7 +216,7 @@ vim.keymap.set('n', '<leader>o', '<cmd>Neotree reveal<CR>', { desc = 'Reveal fil
 vim.keymap.set('n', '<leader>fe', '<cmd>Neotree focus filesystem left<CR>', { desc = 'Focus Neo-tree (filesystem)' })
 
 -- Git and Buffers views (optional)
-vim.keymap.set('n', '<leader>fg', '<cmd>Neotree float git_status<CR>', { desc = 'Git Status (Neo-tree)' })
+-- vim.keymap.set('n', '<leader>fg', '<cmd>Neotree float git_status<CR>', { desc = 'Git Status (Neo-tree)' })
 vim.keymap.set('n', '<leader>fb', '<cmd>Neotree float buffers<CR>', { desc = 'Open Buffers (Neo-tree)' })
 
 -- [[ Basic Autocommands ]]
@@ -1041,6 +1044,46 @@ require('lazy').setup({
     end,
   },
 
+  -- {
+  --   'Mofiqul/dracula.nvim',
+  --   priority = 1000,
+  --   config = function()
+  --     ---@diagnostic disable-next-line: missing-fields
+  --     require('dracula').setup {
+  --       -- colors = {
+  --       --   bg = '#282A36',
+  --       --   fg = '#F8F8F2',
+  --       --   selection = '#44475A',
+  --       --   comment = '#6272A4',
+  --       --   red = '#FF5555',
+  --       --   orange = '#FFB86C',
+  --       --   yellow = '#F1FA8C',
+  --       --   green = '#50fa7b',
+  --       --   purple = '#BD93F9',
+  --       --   cyan = '#8BE9FD',
+  --       --   pink = '#FF79C6',
+  --       --   bright_red = '#FF6E6E',
+  --       --   bright_green = '#69FF94',
+  --       --   bright_yellow = '#FFFFA5',
+  --       --   bright_blue = '#D6ACFF',
+  --       --   bright_magenta = '#FF92DF',
+  --       --   bright_cyan = '#A4FFFF',
+  --       --   bright_white = '#FFFFFF',
+  --       --   menu = '#21222C',
+  --       --   visual = '#3E4452',
+  --       --   gutter_fg = '#4B5263',
+  --       --   nontext = '#3B4048',
+  --       --   white = '#ABB2BF',
+  --       --   black = '#191A21',
+  --       -- },
+  --       italic_comment = true,
+  --       show_end_of_buffer = true,
+  --       lualine_bg_color = '#44475a',
+  --     }
+  --     vim.cmd.colorscheme 'dracula'
+  --   end,
+  -- },
+
   {
     'rebelot/kanagawa.nvim',
     priority = 1000,
@@ -1056,6 +1099,35 @@ require('lazy').setup({
       }
       vim.cmd.colorscheme 'kanagawa-dragon'
     end,
+  },
+
+  { -- Copilot for codecompanion
+    'github/copilot.vim',
+    config = function()
+      -- Optional: Disable default <Tab> mapping
+      vim.g.copilot_no_tab_map = true
+      -- Map <C-J> to accept Copilot suggestions
+      vim.api.nvim_set_keymap('i', '<C-J>', 'copilot#Accept("<CR>")', { silent = true, expr = true })
+    end,
+  },
+  -- CodeCompanion installation
+  { 'nvim-lua/plenary.nvim', branch = 'master' },
+  {
+    'olimorris/codecompanion.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
+    },
+    opts = {
+      strategies = {
+        chat = {
+          adapter = 'copilot',
+        },
+      },
+      opts = {
+        log_level = 'DEBUG',
+      },
+    },
   },
 
   -- Highlight todo, notes, etc in comments
@@ -1114,26 +1186,26 @@ require('lazy').setup({
       -- fill any relevant options here
     },
   },
-  {
-    'kdheepak/lazygit.nvim',
-    lazy = true,
-    cmd = {
-      'LazyGit',
-      'LazyGitConfig',
-      'LazyGitCurrentFile',
-      'LazyGitFilter',
-      'LazyGitFilterCurrentFile',
-    },
-    -- optional for floating window border decoration
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-    },
-    -- setting the keybinding for LazyGit with 'keys' is recommended in
-    -- order to load the plugin when the command is run for the first time
-    keys = {
-      { '<leader>gg', '<cmd>LazyGit<cr>', desc = 'LazyGit' },
-    },
-  },
+  -- {
+  --   'kdheepak/lazygit.nvim',
+  --   lazy = true,
+  --   cmd = {
+  --     'LazyGit',
+  --     'LazyGitConfig',
+  --     'LazyGitCurrentFile',
+  --     'LazyGitFilter',
+  --     'LazyGitFilterCurrentFile',
+  --   },
+  --   -- optional for floating window border decoration
+  --   dependencies = {
+  --     'nvim-lua/plenary.nvim',
+  --   },
+  --   -- setting the keybinding for LazyGit with 'keys' is recommended in
+  --   -- order to load the plugin when the command is run for the first time
+  --   keys = {
+  --     { '<leader>gg', '<cmd>LazyGit<cr>', desc = 'LazyGit' },
+  --   },
+  -- },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
