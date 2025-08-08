@@ -104,6 +104,8 @@ vim.opt.number = true
 --  Experiment for yourself to see if you like it!
 vim.opt.relativenumber = true
 
+vim.opt.winbar = '%=%F'
+
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
 
@@ -160,6 +162,14 @@ vim.opt.scrolloff = 10
 -- instead raise a dialog asking if you wish to save the current file(s)
 -- See `:help 'confirm'`
 vim.opt.confirm = true
+
+vim.diagnostic.config {
+  virtual_text = true,
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+}
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -234,12 +244,19 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'go',
+  pattern = { 'go', 'html', 'json' },
   callback = function()
     vim.opt_local.expandtab = false -- Use tabs, not spaces
     vim.opt_local.tabstop = 4 -- 1 tab = 4 spaces visually
     vim.opt_local.shiftwidth = 4 -- >> indent uses 4 spaces
     vim.opt_local.softtabstop = 4 -- <Tab> inserts 1 tab, shown as 4 spaces
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'qf' },
+  callback = function()
+    vim.keymap.set('n', 'q', ':q<CR>', { buffer = true, silent = true })
   end,
 })
 
@@ -292,7 +309,61 @@ require('lazy').setup({
       }
     end,
   },
+  {
+    'mfussenegger/nvim-lint',
+    event = { 'BufReadPre', 'BufNewFile', 'InsertLeave' },
+    config = function()
+      require('lint').linters_by_ft = {
+        go = { 'golangcilint' },
+      }
 
+      if vim.bo.filetype == 'go' then
+        require('lint').try_lint 'golangcilint'
+      end
+
+      -- Lint on save
+      vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+        callback = function()
+          if vim.bo.filetype == 'go' then
+            require('lint').try_lint 'golangcilint'
+          end
+        end,
+      })
+    end,
+  },
+  {
+    'nvim-pack/nvim-spectre',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    cmd = 'Spectre',
+    keys = {
+      {
+        '<leader>sr',
+        function()
+          require('spectre').toggle()
+        end,
+        desc = '[S]pectre [P]anel (Search & Replace)',
+      },
+      {
+        '<leader>sw',
+        function()
+          require('spectre').open_visual { select_word = true }
+        end,
+        desc = '[S]pectre [W]ord under cursor',
+      },
+    },
+    config = function()
+      require('spectre').setup {
+        open_cmd = 'vnew',
+        live_update = true,
+      }
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = 'spectre_panel',
+        callback = function(args)
+          vim.keymap.set('n', 'q', '<cmd>close<CR>', { buffer = args.buf, silent = true, desc = 'Close Spectre panel' })
+        end,
+      })
+    end,
+  },
   { -- It's requiered for neo-test
     'nvim-neotest/nvim-nio',
   },
@@ -512,11 +583,11 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+      -- vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
+      -- vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+      vim.keymap.set('n', '<leader>ss', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
@@ -553,10 +624,12 @@ require('lazy').setup({
       require('bufferline').setup {
         options = {
           mode = 'buffers', -- set to 'tabs' to use tabpages instead
+          numbers = 'ordinal',
           diagnostics = 'nvim_lsp',
           show_buffer_close_icons = false,
           show_close_icon = false,
-          separator_style = 'thin', -- or "thick" | "thin" | { 'left', 'right' }
+          always_show_bufferline = true,
+          separator_style = 'thick', -- or "thick" | "thin" | { 'left', 'right' }
           offsets = {
             {
               filetype = 'NvimTree',
@@ -1013,7 +1086,7 @@ require('lazy').setup({
           return nil
         else
           return {
-            timeout_ms = 500,
+            timeout_ms = 5000,
             lsp_format = 'fallback',
           }
         end
