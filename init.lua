@@ -1165,6 +1165,7 @@ require('lazy').setup({
       require('kanagawa').setup {
         colors = { theme = { all = { ui = { bg_gutter = 'none' } } } },
         theme = 'dragon', -- sets the dragon variant
+        globalStatus = true,
         background = {
           dark = 'dragon',
           light = 'lotus',
@@ -1173,7 +1174,6 @@ require('lazy').setup({
       vim.cmd.colorscheme 'kanagawa-dragon'
     end,
   },
-
   { -- Copilot for codecompanion
     'github/copilot.vim',
     config = function()
@@ -1184,24 +1184,24 @@ require('lazy').setup({
     end,
   },
   -- CodeCompanion installation
-  { 'nvim-lua/plenary.nvim', branch = 'master' },
-  {
-    'olimorris/codecompanion.nvim',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-treesitter/nvim-treesitter',
-    },
-    opts = {
-      strategies = {
-        chat = {
-          adapter = 'copilot',
-        },
-      },
-      opts = {
-        log_level = 'DEBUG',
-      },
-    },
-  },
+  -- { 'nvim-lua/plenary.nvim', branch = 'master' },
+  -- {
+  --   'olimorris/codecompanion.nvim',
+  --   dependencies = {
+  --     'nvim-lua/plenary.nvim',
+  --     'nvim-treesitter/nvim-treesitter',
+  --   },
+  --   opts = {
+  --     strategies = {
+  --       chat = {
+  --         adapter = 'copilot',
+  --       },
+  --     },
+  --     opts = {
+  --       log_level = 'DEBUG',
+  --     },
+  --   },
+  -- },
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = true } },
