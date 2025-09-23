@@ -297,19 +297,6 @@ require('lazy').setup({
   -- Alternatively, use `config = function() ... end` for full control over the configuration.
   -- If you prefer to call `setup` explicitly, use:
   {
-    'lewis6991/gitsigns.nvim',
-    config = function()
-      require('gitsigns').setup {
-        current_line_blame = true,
-        current_line_blame_opts = {
-          delay = 200,
-          virt_text_pos = 'eol',
-          virt_text = true,
-        },
-      }
-    end,
-  },
-  {
     'mfussenegger/nvim-lint',
     event = { 'BufReadPre', 'BufNewFile', 'InsertLeave' },
     config = function()
@@ -436,6 +423,16 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
     },
+    config = function()
+      require('gitsigns').setup {
+        current_line_blame = true,
+        current_line_blame_opts = {
+          delay = 200,
+          virt_text_pos = 'eol',
+          virt_text = true,
+        },
+      }
+    end,
   },
 
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
@@ -451,6 +448,36 @@ require('lazy').setup({
   --
   -- Then, because we use the `opts` key (recommended), the configuration runs
   -- after the plugin has been loaded as `require(MODULE).setup(opts)`.
+  --
+
+  -- INFO: diffview is a Git diff viewer (like `git diff` or `git log -p`)
+  {
+    'sindrets/diffview.nvim',
+    cmd = { 'DiffviewOpen', 'DiffviewClose', 'DiffviewFileHistory' },
+    keys = {
+      { '<leader>gd', '<cmd>DiffviewOpen<cr>', desc = 'Open Diffview' },
+      { '<leader>gh', '<cmd>DiffviewFileHistory %<cr>', desc = 'File History' },
+    },
+    opts = {
+      keymaps = {
+        view = {
+          { 'n', 'q', '<cmd>DiffviewClose<cr>', { desc = 'Close diffview' } },
+        },
+        file_panel = {
+          { 'n', 'q', '<cmd>DiffviewClose<cr>', { desc = 'Close diffview' } },
+        },
+        file_history_panel = {
+          { 'n', 'q', '<cmd>DiffviewClose<cr>', { desc = 'Close diffview' } },
+        },
+      },
+    },
+  },
+
+  {
+    'akinsho/git-conflict.nvim',
+    version = '*',
+    config = true,
+  },
 
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
@@ -1009,6 +1036,84 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         --
+        --
+        ts_ls = {
+          settings = {
+            typescript = {
+              inlayHints = {
+                includeInlayParameterNameHints = 'all',
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+            javascript = {
+              inlayHints = {
+                includeInlayParameterNameHints = 'all',
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+          },
+        },
+
+        eslint = {
+          settings = {
+            codeAction = {
+              disableRuleComment = {
+                enable = true,
+                location = 'separateLine',
+              },
+              showDocumentation = {
+                enable = true,
+              },
+            },
+            codeActionOnSave = {
+              enable = false,
+              mode = 'all',
+            },
+            experimental = {
+              useFlatConfig = false,
+            },
+            format = true,
+            nodePath = '',
+            onIgnoredFiles = 'off',
+            problems = {
+              shortenToSingleLine = false,
+            },
+            quiet = false,
+            rulesCustomizations = {},
+            run = 'onType',
+            useESLintClass = false,
+            validate = 'on',
+            workingDirectory = {
+              mode = 'location',
+            },
+          },
+        },
+
+        -- C# LSP
+        omnisharp = {
+          cmd = { 'omnisharp', '--languageserver', '--hostPID', tostring(vim.fn.getpid()) },
+          enable_editorconfig_support = true,
+          enable_ms_build_load_projects_on_demand = false,
+          enable_roslyn_analyzers = false,
+          organize_imports_on_format = false,
+          enable_import_completion = false,
+          sdk_include_prereleases = true,
+          analyze_open_documents_only = false,
+          -- Unity-specific root detection
+          root_dir = function(fname)
+            return require('lspconfig.util').root_pattern('*.sln', 'Assets')(fname)
+          end,
+        },
 
         lua_ls = {
           -- cmd = { ... },
@@ -1095,6 +1200,12 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         go = { 'goimports', 'gofumpt' },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+        json = { 'prettierd', 'prettier', stop_after_first = true },
+        cs = { 'csharpier' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
@@ -1142,6 +1253,48 @@ require('lazy').setup({
       vim.g.copilot_no_tab_map = true
       -- Map <C-J> to accept Copilot suggestions
       vim.api.nvim_set_keymap('i', '<C-J>', 'copilot#Accept("<CR>")', { silent = true, expr = true })
+    end,
+  },
+  {
+    'goolord/alpha-nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      local alpha = require 'alpha'
+      local dashboard = require 'alpha.themes.dashboard'
+
+      -- Set header
+      dashboard.section.header.val = {
+        '                                                     ',
+        '  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ',
+        '  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ',
+        '  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ',
+        '  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ',
+        '  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ',
+        '  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ',
+        '                                                     ',
+      }
+
+      -- Set menu
+      dashboard.section.buttons.val = {
+        dashboard.button('e', '  New file', ':ene <BAR> startinsert <CR>'),
+        dashboard.button('f', '  Find file', ':Telescope find_files <CR>'),
+        dashboard.button('r', '  Recent files', ':Telescope oldfiles <CR>'),
+        dashboard.button('g', '  Find text', ':Telescope live_grep <CR>'),
+        dashboard.button('c', '  Configuration', ':e $MYVIMRC <CR>'),
+        dashboard.button('q', '  Quit', ':qa<CR>'),
+      }
+
+      -- Set footer
+      local function footer()
+        return "Don't Stop Until You are Proud..."
+      end
+
+      dashboard.section.footer.val = footer()
+
+      alpha.setup(dashboard.opts)
+
+      -- Disable folding on alpha buffer
+      vim.cmd [[autocmd FileType alpha setlocal nofoldenable]]
     end,
   },
   -- CodeCompanion installation
