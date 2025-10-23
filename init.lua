@@ -229,6 +229,9 @@ vim.keymap.set('n', '<leader>fe', '<cmd>Neotree focus filesystem left<CR>', { de
 -- vim.keymap.set('n', '<leader>fg', '<cmd>Neotree float git_status<CR>', { desc = 'Git Status (Neo-tree)' })
 vim.keymap.set('n', '<leader>fb', '<cmd>Neotree float buffers<CR>', { desc = 'Open Buffers (Neo-tree)' })
 
+-- To close all open buffers
+vim.keymap.set('n', '<leader>bD', '<cmd>bufdo bdelete<CR>', { desc = 'Close all buffers' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -1206,6 +1209,7 @@ require('lazy').setup({
         typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
         json = { 'prettierd', 'prettier', stop_after_first = true },
         cs = { 'csharpier' },
+        proto = { 'clang-format' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --
