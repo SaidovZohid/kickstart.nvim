@@ -1,0 +1,16 @@
+{
+  "lspconfig": {
+    "lua_ls": {
+      "Lua.runtime.version": "LuaJIT",
+      "Lua.diagnostics.globals": ["vim"],
+      "Lua.workspace.library": [
+        "$VIMRUNTIME",
+        "${3rd}/luv/library"
+      ],
+      "Lua.workspace.checkThirdParty": false,
+      "Lua.telemetry.enable": false,
+      "Lua.completion.callSnippet": "Replace",
+      "Lua.hint.enable": true
+    }
+  }
+}
