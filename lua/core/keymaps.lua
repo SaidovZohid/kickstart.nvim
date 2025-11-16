@@ -4,8 +4,8 @@ local map = vim.keymap.set
 -- Clear highlights on search
 map('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
--- Diagnostic quickfix
-map('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+-- Diagnostic quickfix (now using trouble.nvim - see lua/plugins/ui.lua for <leader>x* bindings)
+map('n', '<leader>q', '<cmd>Trouble diagnostics toggle filter.buf=0<cr>', { desc = 'Open diagnostic [Q]uickfix list (Trouble)' })
 
 -- Paste without overwriting register
 map('x', '<leader>p', '"_dP', { desc = 'Paste without overwriting register' })
