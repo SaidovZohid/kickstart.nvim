@@ -1,7 +1,4 @@
 return {
-  -- Detect tabstop and shiftwidth automatically
-  'tpope/vim-sleuth',
-
   -- Auto pairs
   {
     'windwp/nvim-autopairs',

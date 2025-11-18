@@ -10,13 +10,41 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 -- Language-specific indentation settings
+local indent_group = vim.api.nvim_create_augroup('custom-indentation', { clear = true })
+
+-- Languages that use tabs
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = { 'go', 'html', 'json' },
+  group = indent_group,
+  pattern = { 'go', 'makefile', 'make', 'json' },
   callback = function()
-    vim.opt_local.expandtab = false -- Use tabs, not spaces
-    vim.opt_local.tabstop = 4 -- 1 tab = 4 spaces visually
-    vim.opt_local.shiftwidth = 4 -- >> indent uses 4 spaces
-    vim.opt_local.softtabstop = 4 -- <Tab> inserts 1 tab, shown as 4 spaces
+    vim.opt_local.expandtab = false
+    vim.opt_local.tabstop = 4
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.softtabstop = 4
+  end,
+})
+
+-- Languages that use 4 spaces
+vim.api.nvim_create_autocmd('FileType', {
+  group = indent_group,
+  pattern = { 'python', 'java', 'php', 'rust', 'c', 'cpp', 'cs' },
+  callback = function()
+    vim.opt_local.expandtab = true
+    vim.opt_local.tabstop = 4
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.softtabstop = 4
+  end,
+})
+
+-- Languages that use 2 spaces (default for most)
+vim.api.nvim_create_autocmd('FileType', {
+  group = indent_group,
+  pattern = { 'lua', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'html', 'css', 'yaml', 'markdown', 'vue', 'svelte' },
+  callback = function()
+    vim.opt_local.expandtab = true
+    vim.opt_local.tabstop = 2
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.softtabstop = 2
   end,
 })
 

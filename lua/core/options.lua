@@ -26,6 +26,11 @@ end)
 
 -- Indentation
 opt.breakindent = true
+opt.expandtab = true -- Use spaces instead of tabs
+opt.tabstop = 2 -- Number of spaces tabs count for
+opt.shiftwidth = 2 -- Size of an indent
+opt.softtabstop = 2 -- Number of spaces tabs count for in edit mode
+opt.smartindent = true -- Insert indents automatically
 
 -- Undo
 opt.undofile = true
