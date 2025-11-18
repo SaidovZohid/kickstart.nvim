@@ -1,5 +1,12 @@
 -- Autocommands
 
+-- Filetype detection for templ files
+vim.filetype.add {
+  extension = {
+    templ = 'templ',
+  },
+}
+
 -- Highlight when yanking text
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
@@ -12,22 +19,22 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- Language-specific indentation settings
 local indent_group = vim.api.nvim_create_augroup('custom-indentation', { clear = true })
 
--- Languages that use tabs
-vim.api.nvim_create_autocmd('FileType', {
-  group = indent_group,
-  pattern = { 'go', 'makefile', 'make', 'json' },
-  callback = function()
-    vim.opt_local.expandtab = false
-    vim.opt_local.tabstop = 4
-    vim.opt_local.shiftwidth = 4
-    vim.opt_local.softtabstop = 4
-  end,
-})
+-- -- Languages that use tabs
+-- vim.api.nvim_create_autocmd('FileType', {
+--   group = indent_group,
+--   pattern = { 'go', 'templ', 'makefile', 'make', 'json' },
+--   callback = function()
+--     vim.opt_local.expandtab = false
+--     vim.opt_local.tabstop = 4
+--     vim.opt_local.shiftwidth = 4
+--     vim.opt_local.softtabstop = 4
+--   end,
+-- })
 
 -- Languages that use 4 spaces
 vim.api.nvim_create_autocmd('FileType', {
   group = indent_group,
-  pattern = { 'python', 'java', 'php', 'rust', 'c', 'cpp', 'cs' },
+  pattern = { 'python', 'java', 'php', 'rust', 'c', 'cpp', 'go', 'cs', 'makefile', 'make', 'json', 'html' },
   callback = function()
     vim.opt_local.expandtab = true
     vim.opt_local.tabstop = 4
@@ -39,7 +46,7 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Languages that use 2 spaces (default for most)
 vim.api.nvim_create_autocmd('FileType', {
   group = indent_group,
-  pattern = { 'lua', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'html', 'css', 'yaml', 'markdown', 'vue', 'svelte' },
+  pattern = { 'lua', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'templ', 'css', 'yaml', 'markdown', 'vue', 'svelte' },
   callback = function()
     vim.opt_local.expandtab = true
     vim.opt_local.tabstop = 2

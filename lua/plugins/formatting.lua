@@ -35,6 +35,10 @@ return {
         typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
         cs = { 'csharpier' },
         proto = { 'clang-format' },
+        templ = {
+          'templ',
+          'injected',
+        },
       },
     },
   },
