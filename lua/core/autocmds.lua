@@ -34,7 +34,7 @@ local indent_group = vim.api.nvim_create_augroup('custom-indentation', { clear =
 -- Languages that use 4 spaces
 vim.api.nvim_create_autocmd('FileType', {
   group = indent_group,
-  pattern = { 'python', 'java', 'php', 'rust', 'c', 'cpp', 'go', 'cs', 'makefile', 'make', 'json', 'html' },
+  pattern = { 'python', 'java', 'php', 'rust', 'c', 'cpp', 'go', 'cs', 'makefile', 'make', 'json', 'html', 'templ' },
   callback = function()
     vim.opt_local.expandtab = true
     vim.opt_local.tabstop = 4
@@ -46,7 +46,7 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Languages that use 2 spaces (default for most)
 vim.api.nvim_create_autocmd('FileType', {
   group = indent_group,
-  pattern = { 'lua', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'templ', 'css', 'yaml', 'markdown', 'vue', 'svelte' },
+  pattern = { 'lua', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'css', 'yaml', 'markdown', 'vue', 'svelte' },
   callback = function()
     vim.opt_local.expandtab = true
     vim.opt_local.tabstop = 2
