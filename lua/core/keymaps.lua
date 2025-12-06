@@ -25,6 +25,7 @@ map('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 -- Neo-tree
 map('n', '<leader>e', '<cmd>Neotree toggle<CR>', { desc = 'Toggle Neo-tree' })
 map('n', '<leader>o', '<cmd>Neotree reveal<CR>', { desc = 'Reveal file in Neo-tree' })
+map('n', '<leader>O', '<cmd>Neotree close<CR>', { desc = 'Close Neo-tree' })
 map('n', '<leader>fe', '<cmd>Neotree focus filesystem left<CR>', { desc = 'Focus Neo-tree (filesystem)' })
 map('n', '<leader>fb', '<cmd>Neotree float buffers<CR>', { desc = 'Open Buffers (Neo-tree)' })
 
