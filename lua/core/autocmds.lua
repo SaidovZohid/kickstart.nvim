@@ -19,6 +19,14 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- Language-specific indentation settings
 local indent_group = vim.api.nvim_create_augroup('custom-indentation', { clear = true })
 
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'templ',
+  callback = function()
+    -- Go-style comments work perfectly in templ
+    vim.bo.commentstring = '// %s'
+  end,
+})
+
 -- -- Languages that use tabs
 -- vim.api.nvim_create_autocmd('FileType', {
 --   group = indent_group,
