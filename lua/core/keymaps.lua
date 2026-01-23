@@ -16,18 +16,15 @@ map('n', '<leader>cc', ':CodeCompanion chat<CR>', { desc = 'Open CodeCompanion C
 -- Terminal mode exit
 map('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+-- ToggleTerm
+map('n', '<C-\\>', '<cmd>ToggleTerm<CR>', { desc = 'Toggle terminal' })
+map('t', '<C-\\>', '<cmd>ToggleTerm<CR>', { desc = 'Toggle terminal' })
+
 -- Window navigation
 map('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 map('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 map('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 map('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
--- Neo-tree
-map('n', '<leader>e', '<cmd>Neotree toggle<CR>', { desc = 'Toggle Neo-tree' })
-map('n', '<leader>o', '<cmd>Neotree reveal<CR>', { desc = 'Reveal file in Neo-tree' })
-map('n', '<leader>O', '<cmd>Neotree close<CR>', { desc = 'Close Neo-tree' })
-map('n', '<leader>fe', '<cmd>Neotree focus filesystem left<CR>', { desc = 'Focus Neo-tree (filesystem)' })
-map('n', '<leader>fb', '<cmd>Neotree float buffers<CR>', { desc = 'Open Buffers (Neo-tree)' })
 
 -- Buffer management
 map('n', '<leader>bD', '<cmd>bufdo bdelete<CR>', { desc = 'Close all buffers' })
@@ -40,3 +37,7 @@ map('n', '<leader>bo', function()
   local current = vim.fn.bufnr()
   vim.cmd('bufdo if bufnr("") != ' .. current .. ' | bdelete | endif')
 end, { desc = 'Close other buffers', silent = true })
+
+-- Oil file explorer
+map('n', '<leader>o', '<Cmd>Oil<CR>', { desc = 'Open Parent Directory(Oil)' })
+map('n', '<leader>e', '<Cmd>Oil .<CR>', { desc = 'Open File Explorer(Oil)' })

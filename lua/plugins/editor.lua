@@ -6,26 +6,13 @@ return {
     opts = {},
   },
 
-  -- Neo-tree
-  {
-    'nvim-neo-tree/neo-tree.nvim',
-    branch = 'v3.x',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-tree/nvim-web-devicons',
-      'MunifTanjim/nui.nvim',
-    },
-    lazy = false,
-    opts = {},
-  },
-
   -- Toggle terminal
   {
     'akinsho/toggleterm.nvim',
     version = '*',
     config = function()
       require('toggleterm').setup {
-        open_mapping = [[<C-_>]],
+        open_mapping = [[<c-\>]],
         direction = 'float',
         float_opts = {
           border = 'curved',
