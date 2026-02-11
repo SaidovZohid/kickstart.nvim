@@ -113,6 +113,17 @@ return {
             gopls = {
               analyses = { unusedparams = true },
               staticcheck = true,
+              -- Watch for generated files
+              experimentalWatchedFileDelay = '100ms',
+              -- Include generated code directories
+              directoryFilters = {
+                '-**/node_modules',
+                '-**/.git',
+              },
+              -- Better support for generated code
+              allowImplicitNetworkAccess = true,
+              -- Ensure gopls notices file changes
+              allExperiments = true,
             },
           },
         },
