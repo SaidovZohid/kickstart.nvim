@@ -194,17 +194,36 @@ return {
             },
           },
         },
-        sqls = {
+        intelephense = {
           settings = {
-            sqls = {
-              connections = {},
+            intelephense = {
+              files = {
+                associations = { '*.php', '*.phtml' },
+                exclude = { '**/vendor/**', '**/node_modules/**', '**/.git/**' },
+              },
+              diagnostics = {
+                undefinedTypes = true,
+                undefinedFunctions = true,
+                undefinedConstants = true,
+                undefinedClassConstants = true,
+                undefinedMethods = true,
+                undefinedProperties = true,
+              },
+              completion = {
+                insertUseDeclaration = true,
+                fullyQualifyGlobalConstantsAndFunctions = false,
+                triggerParameterHints = true,
+              },
+              format = {
+                braces = 'psr12',
+              },
             },
           },
         },
       }
 
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, { 'stylua', 'templ', 'sqlfluff' })
+      vim.list_extend(ensure_installed, { 'stylua', 'templ', 'sqlfluff', 'intelephense', 'pint' })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {

@@ -40,6 +40,7 @@ return {
           'injected',
         },
         sql = { 'sqlfluff' },
+        php = { 'pint' },
       },
     },
   },
