@@ -42,7 +42,7 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Languages that use 4 spaces
 vim.api.nvim_create_autocmd('FileType', {
   group = indent_group,
-  pattern = { 'python', 'java', 'php', 'rust', 'c', 'cpp', 'go', 'cs', 'makefile', 'make', 'json', 'html', 'templ' },
+  pattern = { 'python', 'java', 'php', 'rust', 'c', 'cpp', 'go', 'cs', 'makefile', 'make', 'json', 'html', 'templ', 'sql' },
   callback = function()
     vim.opt_local.expandtab = true
     vim.opt_local.tabstop = 4

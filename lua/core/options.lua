@@ -53,8 +53,7 @@ opt.splitright = true
 opt.splitbelow = true
 
 -- Whitespace characters
-opt.list = true
-opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+opt.list = false
 
 -- Live substitution preview
 opt.inccommand = 'split'

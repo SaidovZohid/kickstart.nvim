@@ -39,6 +39,7 @@ return {
           'templ',
           'injected',
         },
+        sql = { 'sqlfluff' },
       },
     },
   },

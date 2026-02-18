@@ -194,10 +194,17 @@ return {
             },
           },
         },
+        sqls = {
+          settings = {
+            sqls = {
+              connections = {},
+            },
+          },
+        },
       }
 
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, { 'stylua', 'templ' })
+      vim.list_extend(ensure_installed, { 'stylua', 'templ', 'sqlfluff' })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
