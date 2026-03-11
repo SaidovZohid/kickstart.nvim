@@ -41,3 +41,7 @@ end, { desc = 'Close other buffers', silent = true })
 -- Oil file explorer
 map('n', '<leader>o', '<Cmd>Oil<CR>', { desc = 'Open Parent Directory(Oil)' })
 map('n', '<leader>e', '<Cmd>Oil .<CR>', { desc = 'Open File Explorer(Oil)' })
+
+-- Todo comments
+map('n', '<leader>xt', '<cmd>TodoTelescope<cr>', { desc = 'Todo (Telescope)' })
+map('n', '<leader>st', '<cmd>TodoTelescope<cr>', { desc = '[S]earch [T]odos' })

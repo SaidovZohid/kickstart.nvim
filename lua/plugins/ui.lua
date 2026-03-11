@@ -92,6 +92,7 @@ return {
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>x', group = 'Trouble Diagnostics' },
+        { '<leader>xt', group = 'Todo (Telescope)' },
       },
     },
   },
@@ -136,7 +137,20 @@ return {
     'folke/todo-comments.nvim',
     event = 'VimEnter',
     dependencies = { 'nvim-lua/plenary.nvim' },
-    opts = { signs = true },
+    opts = {
+      signs = true,
+      search = {
+        args = {
+          '--color=never',
+          '--no-heading',
+          '--with-filename',
+          '--line-number',
+          '--column',
+          '--glob=!**/swagger/**',
+          '--glob=!**/swagger-ui*',
+        },
+      },
+    },
   },
 
   -- Trouble.nvim - Better diagnostics list
