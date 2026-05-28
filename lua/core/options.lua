@@ -9,6 +9,12 @@ vim.g.maplocalleader = ' '
 -- Nerd Font
 vim.g.have_nerd_font = true
 
+-- Disable unused language providers (silences :checkhealth warnings)
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_python3_provider = 0
+
 -- Line numbers
 opt.number = true
 opt.relativenumber = true
@@ -61,17 +67,11 @@ opt.inccommand = 'split'
 -- Cursor line
 opt.cursorline = true
 
+-- True color support
+opt.termguicolors = true
+
 -- Scroll offset
 opt.scrolloff = 10
 
 -- Confirm unsaved changes
 opt.confirm = true
-
--- Diagnostic configuration
-vim.diagnostic.config {
-  virtual_text = true,
-  signs = true,
-  underline = true,
-  update_in_insert = false,
-  severity_sort = true,
-}
