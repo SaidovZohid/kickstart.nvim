@@ -1,9 +1,12 @@
 -- Autocommands
 
--- Filetype detection for templ files
+-- Filetype detection
 vim.filetype.add {
   extension = {
     templ = 'templ',
+    gotmpl = 'gotmpl',
+    gohtml = 'gotmpl',
+    gotxt = 'gotmpl',
   },
 }
 
@@ -27,39 +30,22 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- -- Languages that use tabs
--- vim.api.nvim_create_autocmd('FileType', {
---   group = indent_group,
---   pattern = { 'go', 'templ', 'makefile', 'make', 'json' },
---   callback = function()
---     vim.opt_local.expandtab = false
---     vim.opt_local.tabstop = 4
---     vim.opt_local.shiftwidth = 4
---     vim.opt_local.softtabstop = 4
---   end,
--- })
+local indent_width_by_ft = {
+  python = 4, java = 4, php = 4, rust = 4, c = 4, cpp = 4, go = 4, cs = 4,
+  makefile = 4, make = 4, json = 4, html = 4, templ = 4, sql = 4,
+  lua = 2, javascript = 2, typescript = 2, javascriptreact = 2, typescriptreact = 2,
+  css = 2, yaml = 2, markdown = 2, vue = 2, svelte = 2,
+}
 
--- Languages that use 4 spaces
 vim.api.nvim_create_autocmd('FileType', {
   group = indent_group,
-  pattern = { 'python', 'java', 'php', 'rust', 'c', 'cpp', 'go', 'cs', 'makefile', 'make', 'json', 'html', 'templ', 'sql' },
-  callback = function()
+  callback = function(args)
+    local width = indent_width_by_ft[args.match]
+    if not width then return end
     vim.opt_local.expandtab = true
-    vim.opt_local.tabstop = 4
-    vim.opt_local.shiftwidth = 4
-    vim.opt_local.softtabstop = 4
-  end,
-})
-
--- Languages that use 2 spaces (default for most)
-vim.api.nvim_create_autocmd('FileType', {
-  group = indent_group,
-  pattern = { 'lua', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'css', 'yaml', 'markdown', 'vue', 'svelte' },
-  callback = function()
-    vim.opt_local.expandtab = true
-    vim.opt_local.tabstop = 2
-    vim.opt_local.shiftwidth = 2
-    vim.opt_local.softtabstop = 2
+    vim.opt_local.tabstop = width
+    vim.opt_local.shiftwidth = width
+    vim.opt_local.softtabstop = width
   end,
 })
 
@@ -71,11 +57,15 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- Spectre panel keymap
+-- Grug-far panel: q to close window + delete buffer
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'spectre_panel',
+  pattern = 'grug-far',
   callback = function(args)
-    vim.keymap.set('n', 'q', '<cmd>close<CR>', { buffer = args.buf, silent = true, desc = 'Close Spectre panel' })
+    vim.keymap.set('n', 'q', function()
+      local buf = args.buf
+      pcall(vim.api.nvim_win_close, 0, true)
+      pcall(vim.api.nvim_buf_delete, buf, { force = true })
+    end, { buffer = args.buf, silent = true, desc = 'Close grug-far panel' })
   end,
 })
 
@@ -87,81 +77,53 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- ============================================================================
--- LSP Workspace Refresh for Generated Code (sqlc, protobuf, etc.)
--- ============================================================================
-
--- Function to restart gopls clients
+-- Regenerate code and refresh gopls when source files change (sqlc, protobuf, etc.)
 local function restart_gopls()
-  local clients = vim.lsp.get_clients({ name = 'gopls' })
-  for _, client in ipairs(clients) do
-    -- Get all buffers attached to this client
+  for _, client in ipairs(vim.lsp.get_clients { name = 'gopls' }) do
     local buffers = vim.lsp.get_buffers_by_client_id(client.id)
-
-    -- Stop the client
     vim.lsp.stop_client(client.id, true)
-
     -- Small delay to ensure clean restart
     vim.defer_fn(function()
-      -- Restart LSP for all previously attached buffers
       for _, bufnr in ipairs(buffers) do
         if vim.api.nvim_buf_is_valid(bufnr) then
-          vim.cmd.edit({ bang = true })
+          vim.cmd.edit { bang = true }
         end
       end
     end, 100)
   end
 end
 
--- Auto-refresh gopls after saving .sql files (sqlc) or .proto files (protobuf)
-local gopls_refresh_group = vim.api.nvim_create_augroup('gopls-refresh', { clear = true })
+local generators = {
+  sql   = { cmd = 'make sqlc',  label = 'sqlc' },
+  proto = { cmd = 'make proto', label = 'Protobuf' },
+}
+
+local patterns = {}
+for ext in pairs(generators) do
+  table.insert(patterns, '*.' .. ext)
+end
 
 vim.api.nvim_create_autocmd('BufWritePost', {
-  group = gopls_refresh_group,
-  pattern = { '*.sql', '*.proto' },
-  callback = function()
-    -- Show notification
-    vim.notify('Generating code and refreshing gopls...', vim.log.levels.INFO)
+  group = vim.api.nvim_create_augroup('gopls-refresh', { clear = true }),
+  pattern = patterns,
+  desc = 'Generate code and refresh gopls on save',
+  callback = function(args)
+    local gen = generators[vim.fn.fnamemodify(args.file, ':e')]
+    if not gen then return end
 
-    -- Run generation command based on file type
-    local file = vim.fn.expand('%:p')
-    local cwd = vim.fn.getcwd()
-
-    if file:match('%.sql$') then
-      -- For sqlc files - using project's make command
-      vim.fn.jobstart('make sqlc', {
-        cwd = cwd,
-        on_exit = function(_, exit_code)
+    vim.notify('Generating ' .. gen.label .. ' and refreshing gopls...', vim.log.levels.INFO)
+    vim.fn.jobstart(gen.cmd, {
+      cwd = vim.fn.getcwd(),
+      on_exit = function(_, exit_code)
+        vim.schedule(function()
           if exit_code == 0 then
-            vim.schedule(function()
-              restart_gopls()
-              vim.notify('sqlc generated & gopls refreshed!', vim.log.levels.INFO)
-            end)
+            restart_gopls()
+            vim.notify(gen.label .. ' generated & gopls refreshed!', vim.log.levels.INFO)
           else
-            vim.schedule(function()
-              vim.notify('make sqlc failed', vim.log.levels.ERROR)
-            end)
+            vim.notify(gen.cmd .. ' failed', vim.log.levels.ERROR)
           end
-        end,
-      })
-    elseif file:match('%.proto$') then
-      -- For proto files - using project's make command
-      vim.fn.jobstart('make proto', {
-        cwd = cwd,
-        on_exit = function(_, exit_code)
-          if exit_code == 0 then
-            vim.schedule(function()
-              restart_gopls()
-              vim.notify('Protobuf generated & gopls refreshed!', vim.log.levels.INFO)
-            end)
-          else
-            vim.schedule(function()
-              vim.notify('make proto failed', vim.log.levels.ERROR)
-            end)
-          end
-        end,
-      })
-    end
+        end)
+      end,
+    })
   end,
-  desc = 'Auto-generate and refresh gopls when saving .sql or .proto files',
 })
