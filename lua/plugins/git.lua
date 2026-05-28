@@ -2,6 +2,7 @@ return {
   -- Gitsigns
   {
     'lewis6991/gitsigns.nvim',
+    event = { 'BufReadPre', 'BufNewFile' },
     opts = {
       current_line_blame = true, -- Toggle with <leader>tb
       current_line_blame_opts = {
@@ -90,6 +91,7 @@ return {
   {
     'akinsho/git-conflict.nvim',
     version = '*',
+    event = 'BufReadPost',
     config = true,
   },
 

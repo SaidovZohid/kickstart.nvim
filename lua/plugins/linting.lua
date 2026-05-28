@@ -1,21 +1,17 @@
 return {
   {
     'mfussenegger/nvim-lint',
-    event = { 'BufReadPre', 'BufNewFile', 'InsertLeave' },
+    event = { 'BufReadPost', 'BufNewFile' },
     config = function()
       require('lint').linters_by_ft = {
         go = { 'golangcilint' },
       }
 
-      if vim.bo.filetype == 'go' then
-        require('lint').try_lint 'golangcilint'
-      end
-
-      -- Lint on save
-      vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
+      vim.api.nvim_create_autocmd({ 'BufWritePost', 'InsertLeave' }, {
+        group = vim.api.nvim_create_augroup('user-lint', { clear = true }),
         callback = function()
-          if vim.bo.filetype == 'go' then
-            require('lint').try_lint 'golangcilint'
+          if vim.opt_local.modifiable:get() then
+            require('lint').try_lint()
           end
         end,
       })
