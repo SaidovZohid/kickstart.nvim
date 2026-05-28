@@ -33,13 +33,21 @@ return {
     end,
   },
 
-  -- Mini.nvim modules
+  -- Mini.nvim modules (individual repos)
   {
-    'echasnovski/mini.nvim',
+    'nvim-mini/mini.ai',
+    event = 'VeryLazy',
+    opts = { n_lines = 500 },
+  },
+  {
+    'nvim-mini/mini.surround',
+    event = 'VeryLazy',
+    opts = {},
+  },
+  {
+    'nvim-mini/mini.statusline',
+    event = 'VeryLazy',
     config = function()
-      require('mini.ai').setup { n_lines = 500 }
-      require('mini.surround').setup()
-
       local statusline = require 'mini.statusline'
       statusline.setup { use_icons = vim.g.have_nerd_font }
       statusline.section_location = function()
@@ -90,6 +98,7 @@ return {
       spec = {
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
+        { '<leader>T', group = '[T]erminal' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
         { '<leader>x', group = 'Trouble Diagnostics' },
         { '<leader>xt', group = 'Todo (Telescope)' },
@@ -101,6 +110,7 @@ return {
   {
     'akinsho/bufferline.nvim',
     version = '*',
+    event = 'VeryLazy',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
       require('bufferline').setup {
@@ -112,6 +122,11 @@ return {
           show_close_icon = false,
           always_show_bufferline = true,
           separator_style = 'thick',
+          custom_filter = function(buf_number)
+            local ft = vim.bo[buf_number].filetype
+            local skip = { ['grug-far'] = true, oil = true, dbee = true, qf = true }
+            return not skip[ft]
+          end,
           offsets = {
             {
               filetype = 'NvimTree',
@@ -125,11 +140,23 @@ return {
     end,
   },
 
-  -- Indent line
+  -- Indent scope highlight (current scope only)
   {
-    'lukas-reineke/indent-blankline.nvim',
-    main = 'ibl',
-    opts = {},
+    'nvim-mini/mini.indentscope',
+    event = { 'BufReadPost', 'BufNewFile' },
+    opts = {
+      symbol = '│',
+      options = { try_as_border = true },
+    },
+    init = function()
+      vim.api.nvim_set_hl(0, 'MiniIndentscopeSymbol', { link = 'Comment' })
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = { 'help', 'alpha', 'dashboard', 'Trouble', 'lazy', 'mason', 'oil', 'dbee', 'grug-far' },
+        callback = function()
+          vim.b.miniindentscope_disable = true
+        end,
+      })
+    end,
   },
 
   -- Todo comments
