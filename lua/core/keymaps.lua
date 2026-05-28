@@ -16,10 +16,6 @@ map('n', '<leader>cc', ':CodeCompanion chat<CR>', { desc = 'Open CodeCompanion C
 -- Terminal mode exit
 map('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
--- ToggleTerm
-map('n', '<C-\\>', '<cmd>ToggleTerm<CR>', { desc = 'Toggle terminal' })
-map('t', '<C-\\>', '<cmd>ToggleTerm<CR>', { desc = 'Toggle terminal' })
-
 -- Window navigation
 map('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 map('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
