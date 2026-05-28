@@ -1,7 +1,7 @@
 return {
   -- Auto pairs
   {
-    'windwp/nvim-autopairs',
+    'nvim-mini/mini.pairs',
     event = 'InsertEnter',
     opts = {},
   },
@@ -10,6 +10,13 @@ return {
   {
     'akinsho/toggleterm.nvim',
     version = '*',
+    cmd = { 'ToggleTerm', 'TermExec' },
+    keys = {
+      [[<C-\>]],
+      { '<leader>Tf', '<cmd>1ToggleTerm direction=float<cr>', desc = 'Terminal: [F]loat' },
+      { '<leader>Th', '<cmd>2ToggleTerm direction=horizontal size=15<cr>', desc = 'Terminal: [H]orizontal' },
+      { '<leader>Tv', '<cmd>3ToggleTerm direction=vertical size=80<cr>', desc = 'Terminal: [V]ertical' },
+    },
     config = function()
       require('toggleterm').setup {
         open_mapping = [[<c-\>]],
@@ -21,32 +28,26 @@ return {
     end,
   },
 
-  -- Search and replace
+  -- Search and replace (grug-far)
   {
-    'nvim-pack/nvim-spectre',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    cmd = 'Spectre',
+    'MagicDuck/grug-far.nvim',
+    cmd = 'GrugFar',
     keys = {
       {
         '<leader>sr',
         function()
-          require('spectre').toggle()
+          require('grug-far').open()
         end,
-        desc = '[S]pectre [P]anel (Search & Replace)',
+        desc = '[S]earch and [R]eplace (grug-far)',
       },
       {
         '<leader>sw',
         function()
-          require('spectre').open_visual { select_word = true }
+          require('grug-far').open { prefills = { search = vim.fn.expand '<cword>' } }
         end,
-        desc = '[S]pectre [W]ord under cursor',
+        desc = '[S]earch [W]ord under cursor (grug-far)',
       },
     },
-    config = function()
-      require('spectre').setup {
-        open_cmd = 'vnew',
-        live_update = true,
-      }
-    end,
+    opts = {},
   },
 }
