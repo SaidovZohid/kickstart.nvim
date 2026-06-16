@@ -70,6 +70,10 @@ opt.cursorline = true
 -- True color support
 opt.termguicolors = true
 
+-- Wrapping
+opt.wrap = true
+opt.linebreak = true
+
 -- Scroll offset
 opt.scrolloff = 10
 
